@@ -1,0 +1,33 @@
+services:
+  server image:
+    image: 
+    volumes: 
+      - ./models:/app/models
+    ports:
+      - "8000:8000"
+    command: >
+      -m /app/models/deepseek/DeepSeek-Coder-V2-Lite-Instruct-Q4_K_S.gguf --port 8000 --host 0.0.0.0 -n 512
+
+  llama-cpp-server:
+    build:
+      context: llama.cpp/
+      dockerfile: .devops/vulkan.Dockerfile
+      target: server
+    container_name: llama-cpp-server
+    # restart: unless-stopped
+    ports:
+      - "5989:8080"
+    # volumes:
+    #   - ./models:/app/models  # Mount your models directory
+    environment:
+    #   - MODEL_PATH=/models
+      - CUDA_VISIBLE_DEVICES=0  # Optional: specify which GPU to use
+      - NVIDIA_VISIBLE_DEVICES=all
+      # Add other environment variables as needed
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all  # Number of GPUs
+    #           capabilities: [gpu]
